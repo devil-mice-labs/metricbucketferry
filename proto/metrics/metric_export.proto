@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package metrics.export.v1;
+
+option go_package = "github.com/devil-mice-labs/metricbucketferry/pkg/metricspb";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/metric.proto";
+import "google/monitoring/v3/metric.proto";
+
+// MetricDescriptorExport wraps the exported metric descriptors
+message MetricDescriptorExport {
+  // Export metadata
+  ExportMetadata metadata = 1;
+
+  // List of metric descriptors
+  repeated MetricDescriptorSnapshot descriptors = 2;
+}
+
+// Export metadata
+message ExportMetadata {
+  string project_id = 1;
+  google.protobuf.Timestamp export_time = 2;
+  string exporter_version = 3;
+  int32 total_count = 4;
+}
+
+// Snapshot of a metric descriptor
+message MetricDescriptorSnapshot {
+  // Original metric descriptor from API
+  google.api.MetricDescriptor descriptor = 1;
+
+  // Additional extraction metadata
+  google.protobuf.Timestamp captured_at = 2;
+}
+
+// Time series export for a single metric
+message TimeSeriesExport {
+  // Export metadata
+  ExportMetadata metadata = 1;
+
+  // Metric type identifier
+  string metric_type = 2;
+
+  // Query time range
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+
+  // Time series data from Cloud Monitoring API
+  repeated google.monitoring.v3.TimeSeries time_series = 5;
+}
